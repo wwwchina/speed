@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/speed.iml" filepath="$PROJECT_DIR$/.idea/modules/speed.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/speed.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/speed.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/core/speed.core.iml" filepath="$PROJECT_DIR$/.idea/modules/core/speed.core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/uiasr/speed.uiasr.iml" filepath="$PROJECT_DIR$/.idea/modules/uiasr/speed.uiasr.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/uidialog/speed.uidialog.iml" filepath="$PROJECT_DIR$/.idea/modules/uidialog/speed.uidialog.iml" />
+    </modules>
+  </component>
+</project>
