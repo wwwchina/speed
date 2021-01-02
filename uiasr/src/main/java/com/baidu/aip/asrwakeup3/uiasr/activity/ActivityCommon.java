@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.StrictMode;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -79,6 +80,7 @@ public abstract class ActivityCommon extends AppCompatActivity {
                 txtLog.setText("");
             }
             txtLog.append(msg.obj.toString() + "\n");
+            Log.e("语音日志",msg.obj.toString());
         }
     }
 

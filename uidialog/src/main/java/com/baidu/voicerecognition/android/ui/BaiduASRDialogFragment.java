@@ -182,7 +182,7 @@ public abstract class BaiduASRDialogFragment extends DialogFragment {
     public void onStop() {
         super.onStop();
         myRecognizer.cancel(); // 注意：在android 4.3及以下系统中，调用destroy方法会将立即与service解绑，cancel和destroy一起调用时，cancel不起作用，故需分开！
- dismiss();
+//        dismiss();
     }
 
 
@@ -302,5 +302,8 @@ public abstract class BaiduASRDialogFragment extends DialogFragment {
         }
     }
 
-
+    @Override
+    public void dismiss() {
+        super.dismiss();
+    }
 }

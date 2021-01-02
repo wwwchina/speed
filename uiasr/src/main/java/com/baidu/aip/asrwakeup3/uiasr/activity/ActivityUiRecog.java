@@ -135,59 +135,6 @@ public abstract class ActivityUiRecog extends ActivityCommon implements IStatus 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//        btn.setOnClickListener(new View.OnClickListener() {
-//
-//            @Override
-//            public void onClick(View v) {
-//                switch (status) {
-//                    case STATUS_NONE: // 初始状态
-//                        start();
-//                        status = STATUS_WAITING_READY;
-//                        updateBtnTextByStatus();
-//                        txtLog.setText("");
-////                        txtResult.setText("");
-//                        break;
-//                    case STATUS_WAITING_READY: // 调用本类的start方法后，即输入START事件后，等待引擎准备完毕。
-//                    case STATUS_READY: // 引擎准备完毕。
-//                    case STATUS_SPEAKING: // 用户开始讲话
-//                    case STATUS_FINISHED: // 一句话识别语音结束
-//                    case STATUS_RECOGNITION: // 识别中
-//                        stop();
-//                        status = STATUS_STOPPED; // 引擎识别中
-//                        updateBtnTextByStatus();
-//                        break;
-//                    case STATUS_LONG_SPEECH_FINISHED: // 长语音识别结束
-//                    case STATUS_STOPPED: // 引擎识别中
-//                        cancel();
-//                        status = STATUS_NONE; // 识别结束，回到初始状态
-//                        updateBtnTextByStatus();
-//                        break;
-//                    default:
-//                        break;
-//                }
-//
-//            }
-//        });
         if (setting != null && settingActivityClass != null) {
             setting.setOnClickListener(new View.OnClickListener() {
 
@@ -211,14 +158,14 @@ public abstract class ActivityUiRecog extends ActivityCommon implements IStatus 
                 if (msg.arg2 == 1) {
 
 
-
+                    Log.e("临时结果7   ",result);
                     if((System.currentTimeMillis()-time)<500){
                         break;
                     }
                     time=System.currentTimeMillis();
                     Log.e("回调次数","aaaaa");
 
-
+                    Log.e("临时结果6   ",result);
                     if(result.startsWith("11")
                     ||result.startsWith("12")
                     ||result.startsWith("10")
@@ -230,7 +177,10 @@ public abstract class ActivityUiRecog extends ActivityCommon implements IStatus 
                     }
                     Toast.makeText(ActivityUiRecog.this,"输入成功",Toast.LENGTH_LONG).show();
                     txtResult.setText(txtResult.getText().toString()+"\n"+result);
+
+
                 }
+
                 status = msg.what;
                 updateBtnTextByStatus();
                 break;
@@ -240,10 +190,20 @@ public abstract class ActivityUiRecog extends ActivityCommon implements IStatus 
             case STATUS_RECOGNITION:
 
                 if(result.contains("临时识别结果")){
-                    result=result.replace("临时识别结果","");
-                    if(result.length()==11){
-                        autoStop();
-                    }
+                    Log.e("临时结果5   ",result);
+                    result=result.substring(result.indexOf("#")+1,result.lastIndexOf("#"));
+                    Log.e("临时结果4   ",result);
+//                    if(result.length()>=10){
+//                        autoStop();
+//                        Log.e("临时结果1   ",result);
+//                    }
+                }else if(result.contains("识别引擎结束并空闲中")){
+//                    btn.postDelayed(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            btn.performClick();
+//                        }
+//                    },500);
                 }
 
 

@@ -1,6 +1,8 @@
 package com.baidu.aip.asrwakeup3.core.recog.listener;
 
 
+import android.util.Log;
+
 import com.baidu.aip.asrwakeup3.core.recog.RecogResult;
 
 import java.util.ArrayList;
@@ -120,6 +122,7 @@ public class ChainRecogListener implements IRecogListener {
     public void onAsrExit() {
         for (IRecogListener listener : listeners) {
             listener.onAsrExit();
+            Log.e("监听","循环");
         }
     }
 

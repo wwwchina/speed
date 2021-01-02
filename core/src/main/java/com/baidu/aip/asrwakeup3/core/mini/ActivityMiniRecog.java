@@ -2,6 +2,11 @@ package com.baidu.aip.asrwakeup3.core.mini;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.media.AudioManager;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.media.SoundPool;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -21,6 +26,7 @@ import com.baidu.speech.EventManager;
 import com.baidu.speech.EventManagerFactory;
 import com.baidu.speech.asr.SpeechConstant;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -57,6 +63,7 @@ public class ActivityMiniRecog extends AppCompatActivity implements EventListene
      * 测试参数填在这里
      */
     private void start() {
+        btn.setText("正在识别中");
         txtLog.setText("");
         Map<String, Object> params = new LinkedHashMap<String, Object>();
         String event = null;
@@ -68,8 +75,11 @@ public class ActivityMiniRecog extends AppCompatActivity implements EventListene
         // 基于SDK集成2.1 设置识别参数
         params.put(SpeechConstant.ACCEPT_AUDIO_VOLUME, false);
         // params.put(SpeechConstant.NLU, "enable");
-        // params.put(SpeechConstant.VAD_ENDPOINT_TIMEOUT, 0); // 长语音
+         params.put(SpeechConstant.VAD_ENDPOINT_TIMEOUT, 0); // 长语音
+        params.put("vad","touch");
+//        params.put("vad.endpoint-timeout","1500");
 
+        params.put("disable-punctuation","true");
         // params.put(SpeechConstant.IN_FILE, "res:///com/baidu/android/voicedemo/16k_test.pcm");
         // params.put(SpeechConstant.VAD, SpeechConstant.VAD_DNN);
         // params.put(SpeechConstant.PID, 1537); // 中文输入法模型，有逗号
@@ -111,6 +121,7 @@ public class ActivityMiniRecog extends AppCompatActivity implements EventListene
      * 基于SDK集成4.1 发送停止事件
      */
     private void stop() {
+        btn.setText("开始");
         printLog("停止识别：ASR_STOP");
         asr.send(SpeechConstant.ASR_STOP, null, null, 0, 0); //
     }
@@ -134,7 +145,9 @@ public class ActivityMiniRecog extends AppCompatActivity implements EventListene
     private void unloadOfflineEngine() {
         asr.send(SpeechConstant.ASR_KWS_UNLOAD_ENGINE, null, null, 0, 0); //
     }
-
+    SoundPool sp ;
+    int soundId;
+    String resultTextFinal="";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -162,6 +175,9 @@ public class ActivityMiniRecog extends AppCompatActivity implements EventListene
         if (enableOffline) {
             loadOfflineEngine(); // 测试离线命令词请开启, 测试 ASR_OFFLINE_ENGINE_GRAMMER_FILE_PATH 参数时开启
         }
+
+        sp = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
+        soundId = sp.load(ActivityMiniRecog.this, R.raw.result_final, 1);
     }
 
     @Override
@@ -204,9 +220,35 @@ public class ActivityMiniRecog extends AppCompatActivity implements EventListene
             } else if (params.contains("\"partial_result\"")) {
                 // 一句话的临时识别结果
                 logTxt += ", 临时识别结果：" + params;
+                try {
+                    JSONObject jsonObject= new JSONObject(params);
+                    String partialResult=jsonObject.getString("best_result");
+                    txtResult.setText(resultTextFinal+partialResult);
+                    if(partialResult.length()>=10){
+                        stop();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
             }  else if (params.contains("\"final_result\""))  {
                 // 一句话的最终识别结果
                 logTxt += ", 最终识别结果：" + params;
+
+                try {
+                    JSONObject jsonObject= new JSONObject(params);
+                    String partialResult=jsonObject.getString("best_result");
+
+                    resultTextFinal+=partialResult+"\n";
+                        txtResult.setText(resultTextFinal);
+                       start();
+                    sp.play(soundId, 1, 1, 0, 0, 1);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
+
             }  else {
                 // 一般这里不会运行
                 logTxt += " ;params :" + params;
@@ -233,7 +275,7 @@ public class ActivityMiniRecog extends AppCompatActivity implements EventListene
             text += "  ;time=" + System.currentTimeMillis();
         }
         text += "\n";
-        Log.i(getClass().getName(), text);
+        Log.e("日志", text);
         txtLog.append(text + "\n");
     }
 

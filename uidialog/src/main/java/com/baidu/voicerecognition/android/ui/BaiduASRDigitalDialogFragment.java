@@ -837,6 +837,7 @@ public class BaiduASRDigitalDialogFragment extends BaiduASRDialogFragment {
             switch (errorType) {
                 case SpeechRecognizer.ERROR_NO_MATCH:
                     mErrorRes = "没有匹配的识别结果";
+                    dismiss();
                     break;
                 case SpeechRecognizer.ERROR_AUDIO:
                     mErrorRes = "启动录音失败";
@@ -916,8 +917,15 @@ public class BaiduASRDigitalDialogFragment extends BaiduASRDialogFragment {
                 }
 
                 mInputEdit.setText(results[0]);
+                Log.e("临时结果3   ",results[0]);
                 mInputEdit.setSelection(mInputEdit.getText().length());
                 delayTime = 0;
+
+                if(results[0].length()==11){
+                    beginRecognitionn();
+                    Log.e("临时结果10   ",results[0]);
+                }
+
             }
         }
 

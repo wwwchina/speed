@@ -34,6 +34,7 @@ public class ActivityUiDialog extends ActivityAbstractRecog {
     private DigitalDialogInput input;
     private ChainRecogListener chainRecogListener;
     private static String TAG = "ActivityUiDialog";
+    public boolean isClick=false;
 
     public ActivityUiDialog() {
         super(R.raw.uidialog_recog, false);
@@ -52,48 +53,92 @@ public class ActivityUiDialog extends ActivityAbstractRecog {
         chainRecogListener.addListener(new MessageStatusRecogListener(handler));
         myRecognizer.setEventListener(chainRecogListener); // 替换掉原来的listener
 
-        btn.setOnTouchListener(new View.OnTouchListener() {
+
+
+        btn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if(event.getAction()==MotionEvent.ACTION_DOWN){
-                    switch (status) {
-                        case STATUS_NONE: // 初始状态
-                            start();
-                            status = STATUS_WAITING_READY;
-                            updateBtnTextByStatus();
-                            txtLog.setText("");
+            public void onClick(View v) {
+                isClick=true;
+                switch (status) {
+                    case STATUS_NONE: // 初始状态
+                        start();
+                        status = STATUS_WAITING_READY;
+                        updateBtnTextByStatus();
+                        txtLog.setText("");
 //                        txtResult.setText("");
-                            break;
-                        case STATUS_WAITING_READY: // 调用本类的start方法后，即输入START事件后，等待引擎准备完毕。
-                        case STATUS_READY: // 引擎准备完毕。
-                        case STATUS_SPEAKING: // 用户开始讲话
-                        case STATUS_FINISHED: // 一句话识别语音结束
-                        case STATUS_RECOGNITION: // 识别中
-                            stop();
-                            status = STATUS_STOPPED; // 引擎识别中
-                            updateBtnTextByStatus();
-                            break;
-                        case STATUS_LONG_SPEECH_FINISHED: // 长语音识别结束
-                        case STATUS_STOPPED: // 引擎识别中
-                            cancel();
-                            status = STATUS_NONE; // 识别结束，回到初始状态
-                            updateBtnTextByStatus();
-                            break;
-                        default:
-                            break;
+                        break;
+                    case STATUS_WAITING_READY: // 调用本类的start方法后，即输入START事件后，等待引擎准备完毕。
+                    case STATUS_READY: // 引擎准备完毕。
+                    case STATUS_SPEAKING: // 用户开始讲话
+                    case STATUS_FINISHED: // 一句话识别语音结束
+                    case STATUS_RECOGNITION: // 识别中
+                        stop();
+                        status = STATUS_STOPPED; // 引擎识别中
+                        updateBtnTextByStatus();
+                        break;
+                    case STATUS_LONG_SPEECH_FINISHED: // 长语音识别结束
+                    case STATUS_STOPPED: // 引擎识别中
+                        cancel();
+                        status = STATUS_NONE; // 识别结束，回到初始状态
+                        updateBtnTextByStatus();
+                        break;
+                    default:
+                        break;
 
-                    }
-
-                    return true;
-                }else if(event.getAction()==MotionEvent.ACTION_UP){
-                                  autoStop();
                 }
 
 
 
-                return true;
             }
         });
+
+
+
+
+
+
+//        btn.setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//                if(event.getAction()==MotionEvent.ACTION_DOWN){
+//                    switch (status) {
+//                        case STATUS_NONE: // 初始状态
+//                            start();
+//                            status = STATUS_WAITING_READY;
+//                            updateBtnTextByStatus();
+//                            txtLog.setText("");
+////                        txtResult.setText("");
+//                            break;
+//                        case STATUS_WAITING_READY: // 调用本类的start方法后，即输入START事件后，等待引擎准备完毕。
+//                        case STATUS_READY: // 引擎准备完毕。
+//                        case STATUS_SPEAKING: // 用户开始讲话
+//                        case STATUS_FINISHED: // 一句话识别语音结束
+//                        case STATUS_RECOGNITION: // 识别中
+//                            stop();
+//                            status = STATUS_STOPPED; // 引擎识别中
+//                            updateBtnTextByStatus();
+//                            break;
+//                        case STATUS_LONG_SPEECH_FINISHED: // 长语音识别结束
+//                        case STATUS_STOPPED: // 引擎识别中
+//                            cancel();
+//                            status = STATUS_NONE; // 识别结束，回到初始状态
+//                            updateBtnTextByStatus();
+//                            break;
+//                        default:
+//                            break;
+//
+//                    }
+//
+//                    return true;
+//                }else if(event.getAction()==MotionEvent.ACTION_UP){
+//                                  autoStop();
+//                }
+//
+//
+//
+//                return true;
+//            }
+//        });
     }
 
     @Override
@@ -101,7 +146,17 @@ public class ActivityUiDialog extends ActivityAbstractRecog {
         super.autoStop();
         if(baiduASRDigitalDialogFragment.isVisible()){
             baiduASRDigitalDialogFragment.beginRecognitionn();
+
+//            if(isClick){
+//                btn.postDelayed(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        btn.performClick();
+//                    }
+//                },1500);
+//            }
         }
+
     }
 
     BaiduASRDigitalDialogFragment baiduASRDigitalDialogFragment;
@@ -127,6 +182,8 @@ public class ActivityUiDialog extends ActivityAbstractRecog {
         baiduASRDigitalDialogFragment=new BaiduASRDigitalDialogFragment();
         baiduASRDigitalDialogFragment.setInput(input);
         baiduASRDigitalDialogFragment.show(getSupportFragmentManager(),"a");
+
+
     }
 
 
