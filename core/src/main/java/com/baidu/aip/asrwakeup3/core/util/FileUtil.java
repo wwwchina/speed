@@ -82,5 +82,23 @@ public class FileUtil {
         Matcher m   =   p.matcher(str);
         return   m.replaceAll("").trim();
     }
+    public static boolean isInteger(String str) {
+        Pattern pattern = Pattern.compile("^[-\\+]?[\\d]*$");
+        return pattern.matcher(str).matches();
+    }
+    public static boolean isPhoneNumber(String partialResult) {
 
+        if(!isInteger(partialResult)){
+            return false;
+        }
+        if(partialResult.startsWith("11")
+                ||partialResult.startsWith("12")
+                ||partialResult.startsWith("10")
+                ||partialResult.startsWith("0")
+        ||!partialResult.startsWith("1")
+        ){
+            return false;
+        }
+return true;
+    }
 }

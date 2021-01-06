@@ -4,6 +4,7 @@
     android:layout_height="fill_parent"
     android:orientation="vertical">
     <ScrollView
+        android:id="@+id/result_srcoll"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/btn"
@@ -14,7 +15,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="8dp"
-        android:textSize="18dp" />
+        android:textSize="18dp"
+
+        />
     </ScrollView>
     <View
         android:layout_width="match_parent"
@@ -50,4 +53,10 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:text="开始" />
+    <Button
+        android:id="@+id/count"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:text="共0个号码" />
 </LinearLayout>
