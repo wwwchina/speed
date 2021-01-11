@@ -41,7 +41,7 @@
         android:layout_height="wrap_content"
         android:text="@string/setting"
         android:id="@+id/setting"
-        android:visibility="gone"
+        android:visibility="visible"
         />
 
     <Button

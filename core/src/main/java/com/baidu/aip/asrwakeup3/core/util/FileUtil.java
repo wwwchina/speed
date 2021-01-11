@@ -96,6 +96,7 @@ public class FileUtil {
                 ||partialResult.startsWith("10")
                 ||partialResult.startsWith("0")
         ||!partialResult.startsWith("1")
+                ||partialResult.length()!=11
         ){
             return false;
         }

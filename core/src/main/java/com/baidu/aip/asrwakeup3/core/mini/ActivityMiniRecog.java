@@ -23,10 +23,7 @@ import androidx.core.content.ContextCompat;
 
 import com.baidu.aip.asrwakeup3.core.R;
 import com.baidu.aip.asrwakeup3.core.inputstream.InFileStream;
-import com.baidu.aip.asrwakeup3.core.recog.RecogResult;
-import com.baidu.aip.asrwakeup3.core.recog.listener.RecogEventAdapter;
 import com.baidu.aip.asrwakeup3.core.util.FileUtil;
-import com.baidu.aip.asrwakeup3.core.util.MyLogger;
 import com.baidu.speech.EventListener;
 import com.baidu.speech.EventManager;
 import com.baidu.speech.EventManagerFactory;
@@ -60,7 +57,6 @@ public class ActivityMiniRecog extends AppCompatActivity implements EventListene
     private EventManager asr;
 
     private boolean logTime = true;
-    private boolean isClick = false;
 
     protected boolean enableOffline = false; // 测试离线命令词，需要改成true
 
@@ -69,6 +65,7 @@ public class ActivityMiniRecog extends AppCompatActivity implements EventListene
      * 点击开始按钮
      * 测试参数填在这里
      */
+    boolean isClick=false;
     private void start() {
         isClick=true;
         btn.setText("正在识别中(点击停止)");
@@ -83,14 +80,14 @@ public class ActivityMiniRecog extends AppCompatActivity implements EventListene
         // 基于SDK集成2.1 设置识别参数
         params.put(SpeechConstant.ACCEPT_AUDIO_VOLUME, false);
         // params.put(SpeechConstant.NLU, "enable");
-         params.put(SpeechConstant.VAD_ENDPOINT_TIMEOUT, 0); // 长语音
+//        params.put(SpeechConstant.VAD_ENDPOINT_TIMEOUT, 0); // 长语音
 //        params.put("vad","touch");
-        params.put("vad.endpoint-timeout","0");
+//        params.put("vad.endpoint-timeout","1500");
 
         params.put("disable-punctuation","true");
         // params.put(SpeechConstant.IN_FILE, "res:///com/baidu/android/voicedemo/16k_test.pcm");
         // params.put(SpeechConstant.VAD, SpeechConstant.VAD_DNN);
-         params.put(SpeechConstant.PID, 15372); // 中文输入法模型，有逗号
+        // params.put(SpeechConstant.PID, 1537); // 中文输入法模型，有逗号
 
         /* 语音自训练平台特有参数 */
         // params.put(SpeechConstant.PID, 8002);
@@ -129,18 +126,12 @@ public class ActivityMiniRecog extends AppCompatActivity implements EventListene
      * 基于SDK集成4.1 发送停止事件
      */
     private void stop() {
-        isClick=false;
         btn.setText("开始");
         printLog("停止识别：ASR_STOP");
         asr.send(SpeechConstant.ASR_STOP, null, null, 0, 0); //
+        isClick=false;
     }
 
-    private void finishSpeak() {
-//        isClick=false;
-//        btn.setText("开始");
-//        printLog("停止识别：ASR_STOP");
-        asr.send(SpeechConstant.CALLBACK_EVENT_ASR_FINISH, null, null, 0, 0); //
-    }
 
     /**
      * enableOffline设为true时，在onCreate中调用
@@ -163,8 +154,8 @@ public class ActivityMiniRecog extends AppCompatActivity implements EventListene
     SoundPool sp ;
     int soundId;
     String resultTextFinal="";
-    ScrollView     result_srcoll;
     TextView count;
+    ScrollView result_srcoll;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -172,11 +163,11 @@ public class ActivityMiniRecog extends AppCompatActivity implements EventListene
         initView();
         initPermission();
         result_srcoll=findViewById(R.id.result_srcoll);
-        count=findViewById(R.id.count);
         // 基于sdk集成1.1 初始化EventManager对象
         asr = EventManagerFactory.create(this, "asr");
         // 基于sdk集成1.3 注册自己的输出事件类
         asr.registerListener(this); //  EventListener 中 onEvent方法
+        count=findViewById(R.id.count);
         btn.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -209,15 +200,6 @@ public class ActivityMiniRecog extends AppCompatActivity implements EventListene
         super.onPause();
         asr.send(SpeechConstant.ASR_CANCEL, "{}", null, 0, 0);
         Log.i("ActivityMiniRecog", "On pause");
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if(isClick){
-            start();
-        }
-
     }
 
     @Override
@@ -256,56 +238,10 @@ public class ActivityMiniRecog extends AppCompatActivity implements EventListene
                 try {
                     JSONObject jsonObject= new JSONObject(params);
                     String partialResult=jsonObject.getString("best_result");
-                    Log.e("结果日志临时",partialResult+"  长度"+partialResult.length());
-                    if(partialResult.length()<=11){
-                        setTxtResult(resultTextFinal+partialResult);
-                    }else{
-
-                        int number=partialResult.length()/11;
-                        StringBuilder sb=new StringBuilder(partialResult);
-                        for (int i = 1; i <number+1; i++) {
-
-                            sb.insert(11*i+(i-1),"\n");
-
-                        }
-                        partialResult=sb.toString();
-                        setTxtResult(resultTextFinal+partialResult);
-
-                    }
-
-
-
+                    setTxtResult(resultTextFinal+partialResult);
                     if(partialResult.length()>=10){
-                        finishSpeak();
+                        stop();
                     }
-
-//                    if(!partialResult.startsWith("11")
-//                            &&!partialResult.startsWith("12")
-//                            &&!partialResult.startsWith("10")
-//                            &&!partialResult.startsWith("0")
-//                            &&partialResult.length()==11){
-//                        resultTextFinal+=partialResult+"\n";
-//                        txtResult.setText(resultTextFinal);
-//                        txtResult.setText(resultTextFinal);
-//                        sp.play(soundId, 1, 1, 0, 0, 1);
-//
-////                           start();
-//                        return;
-//                    }
-
-
-
-
-
-
-
-
-
-
-
-//                    if(partialResult.length()>=10){
-//                        stop();
-//                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -318,49 +254,19 @@ public class ActivityMiniRecog extends AppCompatActivity implements EventListene
                     JSONObject jsonObject= new JSONObject(params);
                     String partialResult=jsonObject.getString("best_result");
 
-                    Log.e("结果日志最终",partialResult+"  长度"+partialResult.length());
 
-                     if(partialResult.length()==11&&FileUtil.isInteger(partialResult)){
-                         if(!FileUtil.isPhoneNumber(partialResult)
-                         ){
-                             Toast.makeText(ActivityMiniRecog.this,"号码格式不正确",Toast.LENGTH_LONG).show();
-                             setTxtResult(resultTextFinal);
+
+
+                    if(!FileUtil.isPhoneNumber(partialResult)){
+                        Toast.makeText(ActivityMiniRecog.this,"号码格式不正确",Toast.LENGTH_LONG).show();
+                        txtResult.setText(resultTextFinal);
 //                           start();
-                             return;
-                         }
-                         resultTextFinal+=partialResult+"\n";
-                         setTxtResult(resultTextFinal);
-//                    start();
-                         sp.play(soundId, 1, 1, 0, 0, 1);
-                     }else{
-                        if(FileUtil.isInteger(partialResult)){
-                            for (int i = 0; i <partialResult.length()/11; i++) {
-                                String part=partialResult.substring(11*i,11*(i+1));
-                                if(!FileUtil.isPhoneNumber(part)){
-                                    Toast.makeText(ActivityMiniRecog.this,"包含不正确的号码",Toast.LENGTH_LONG).show();
-                                    setTxtResult(resultTextFinal);
-//                           start();
-                                    return;
-                                }
-                                resultTextFinal+=part+"\n";
-                            }
-
-                            setTxtResult(resultTextFinal);
-                            sp.play(soundId, 1, 1, 0, 0, 1);
-                            return;
-                        }
-                             Toast.makeText(ActivityMiniRecog.this,"号码格式不正确",Toast.LENGTH_LONG).show();
-                         setTxtResult(resultTextFinal);
-//                           start();
-                             return;
-
-
-//                    start();
-
-                     }
-
-
-
+                        return;
+                    }
+                    resultTextFinal+=partialResult+"\n";
+                    setTxtResult(resultTextFinal);
+                    start();
+                    sp.play(soundId, 1, 1, 0, 0, 1);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -375,19 +281,19 @@ public class ActivityMiniRecog extends AppCompatActivity implements EventListene
                 }
             }
         } if (name.equals(SpeechConstant.CALLBACK_EVENT_ASR_LOADED)) {
-           printLog("文字说明,离线命令词资源加载成功");
+            printLog("文字说明,离线命令词资源加载成功");
         } else if (name.equals(SpeechConstant.CALLBACK_EVENT_ASR_UNLOADED)) {
-           printLog("文字说明,离线命令词资源释放成功");
+            printLog("文字说明,离线命令词资源释放成功");
         } else if (name.equals(SpeechConstant.CALLBACK_EVENT_ASR_READY)) {
             // 引擎准备就绪，可以开始说话
-           printLog("文字说明,ASR_START 输入事件调用后，引擎准备完毕");
+            printLog("文字说明,ASR_START 输入事件调用后，引擎准备完毕");
         } else if (name.equals(SpeechConstant.CALLBACK_EVENT_ASR_BEGIN)) {
             // 检测到用户的已经开始说话
             printLog("文字说明,onAsrReady后检查到用户开始说话");
 
         } else if (name.equals(SpeechConstant.CALLBACK_EVENT_ASR_END)) {
             // 检测到用户的已经停止说话
-           printLog("文字说明,检查到用户开始说话停止，或者ASR_STOP 输入事件调用后，");
+            printLog("文字说明,检查到用户开始说话停止，或者ASR_STOP 输入事件调用后，");
 
         }else if (name.equals(SpeechConstant.CALLBACK_EVENT_ASR_FINISH)) {
             // 识别结束
@@ -396,17 +302,19 @@ public class ActivityMiniRecog extends AppCompatActivity implements EventListene
             printLog("文字说明,长语音识别结束");// 长语音
         } else if (name.equals(SpeechConstant.CALLBACK_EVENT_ASR_EXIT)) {
             printLog("文字说明,引擎完成整个识别，空闲中");
+            if(isClick){
+                start();
+            }
 
-//            start();
         } else if (name.equals(SpeechConstant.CALLBACK_EVENT_ASR_VOLUME)) {
             // Logger.info(TAG, "asr volume event:" + params);
             printLog("文字说明,音量回调");
         } else if (name.equals(SpeechConstant.CALLBACK_EVENT_ASR_AUDIO)) {
-       printLog("CALLBACK_EVENT_ASR_AUDIO\n" +
-               "     * @param data pcm格式，16bits 16000采样率\n" +
-               "     *\n" +
-               "     * @param offset\n" +
-               "     * @param length");
+            printLog("CALLBACK_EVENT_ASR_AUDIO\n" +
+                    "     * @param data pcm格式，16bits 16000采样率\n" +
+                    "     *\n" +
+                    "     * @param offset\n" +
+                    "     * @param length");
         } else {
             // 识别开始，结束，音量，音频数据回调
             if (params != null && !params.isEmpty()){
@@ -427,17 +335,10 @@ public class ActivityMiniRecog extends AppCompatActivity implements EventListene
         }
         text += "\n";
         Log.e("日志", text);
-        if(text.contains("Speech too long")){
-            btn.setText("开始");
-        }
         txtLog.append(text + "\n");
     }
 
-private void setTxtResult(String str){
-    txtResult.setText(str);
-    result_srcoll.scrollTo(0,txtResult.getHeight());
-    count.setText("共"+str.split("\n").length+"个号码");
-}
+
     private void initView() {
         txtResult = (TextView) findViewById(R.id.txtResult);
         txtLog = (TextView) findViewById(R.id.txtLog);
@@ -445,7 +346,11 @@ private void setTxtResult(String str){
         stopBtn = (Button) findViewById(R.id.btn_stop);
         txtLog.setText(DESC_TEXT + "\n");
     }
-
+    private void setTxtResult(String str){
+        txtResult.setText(str);
+        result_srcoll.scrollTo(0,txtResult.getHeight());
+        count.setText("共"+str.split("\n").length+"个号码");
+    }
     /**
      * android 6.0 以上需要动态申请权限
      */
