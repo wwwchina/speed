@@ -81,7 +81,7 @@ public class ActivityMiniRecog extends AppCompatActivity implements EventListene
         params.put(SpeechConstant.ACCEPT_AUDIO_VOLUME, false);
         // params.put(SpeechConstant.NLU, "enable");
 //        params.put(SpeechConstant.VAD_ENDPOINT_TIMEOUT, 0); // 长语音
-//        params.put("vad","touch");
+        params.put("vad","touch");
 //        params.put("vad.endpoint-timeout","1500");
 
         params.put("disable-punctuation","true");
@@ -260,7 +260,7 @@ public class ActivityMiniRecog extends AppCompatActivity implements EventListene
                     if(!FileUtil.isPhoneNumber(partialResult)){
                         Toast.makeText(ActivityMiniRecog.this,"号码格式不正确",Toast.LENGTH_LONG).show();
                         txtResult.setText(resultTextFinal);
-//                           start();
+                           start();
                         return;
                     }
                     resultTextFinal+=partialResult+"\n";
@@ -347,6 +347,7 @@ public class ActivityMiniRecog extends AppCompatActivity implements EventListene
         txtLog.setText(DESC_TEXT + "\n");
     }
     private void setTxtResult(String str){
+        str=FileUtil.StringFilter(str);
         txtResult.setText(str);
         result_srcoll.scrollTo(0,txtResult.getHeight());
         count.setText("共"+str.split("\n").length+"个号码");

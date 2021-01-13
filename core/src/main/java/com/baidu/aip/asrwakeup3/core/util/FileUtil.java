@@ -77,7 +77,7 @@ public class FileUtil {
 
     public static String StringFilter(String str)throws PatternSyntaxException {
         // 只允许字母和数字
-        String   regEx  =  "[^0-9]";
+        String   regEx  =  "[^0-9][\n]";
         Pattern p   =   Pattern.compile(regEx);
         Matcher m   =   p.matcher(str);
         return   m.replaceAll("").trim();
